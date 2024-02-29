@@ -1,5 +1,22 @@
 $(document).ready(function(){
-  
+
+    // Code to add and remove extra education field
+    $('#extraField').on('click',function(event){
+        event.preventDefault();
+        const cloned = $('#extraRow').clone(true); // cloning the row
+        cloned.find('input[type="text"], input[type="date"]').val('');
+        cloned.addClass('removeAnyTime');
+        const clonedButton = cloned.find('.removeField');
+        clonedButton.css('display','block');
+        $('#inputFields').append(cloned);
+        cloned.css('opacity','1');
+    })
+    $(document).on('click','.removeField, span', function(event){
+        event.preventDefault();
+        $(this).closest('.education').remove();
+    })
+
+
     let storedData = [];
     let submit = true;
     $('#submitForm').on('submit',function(event){
@@ -19,12 +36,12 @@ $(document).ready(function(){
 
     function handleFormSubmitForAdding(event){
         event.preventDefault();
-
+     
         const educationData = [];
         const educationInputs = $('.educationForm');
-
+        
         educationInputs.each(function(index){
-
+            
             const educationItem = {
                 degree: $(this).find('input[name="degree"]').val(),
                 school: $(this).find('input[name="school"]').val(),
@@ -58,10 +75,10 @@ $(document).ready(function(){
             alert('Fill all the details correctly')
             return;
         }
-
+        
         //dont submit the form if the functionality are not finished
         let empty = false;
-
+        
         $('input[required]').each(function() {
             if ($(this).val().trim() === "") {
                 empty = true;
@@ -71,22 +88,24 @@ $(document).ready(function(){
         if (empty) {
             alert("Please fill out all the required fields");
         }
-
+        
+        
+        $('.removeAnyTime').remove();
         // Close the Bootstrap modal using jQuery
         $('#exampleModal').modal('hide');        
-
+        
     }
 
     var rowIndex;
     // Handle edit button click
     $('#myTable').on('click', '.edit-button', function() {
-
         $('#submitForm').addClass("editing-mode");
         rowIndex = table.row($(this).parents('tr')).index();
-
+        
         // Retrieve the data for the corresponding row from the storedData array
         var rowData = storedData[rowIndex];
         console.log('Edit button clicked for row:', rowData);
+        $('.removeAnyTime').remove();
         
         // Populate form fields with the data of the clicked row
         $('input[name="firstName"]').val(rowData.firstName);
@@ -95,13 +114,37 @@ $(document).ready(function(){
         $('input[name="email"]').val(rowData.email);
         $('input[name="address"]').val(rowData.address);
         $('input[name="graduateYear"]').val(rowData.graduateYear);
-        
+
+        if (rowData.education.length > 2) {
+            for (var j = 2; j < rowData.education.length; j++) {
+                const cloned = $('#extraRow').clone(true); // cloning the row
+                cloned.find('input[type="text"], input[type="date"]').val('');
+                cloned.addClass('removeAnyTime');
+                const clonedButton = cloned.find('.removeField');
+                clonedButton.css('display','block');
+                $('#inputFields').append(cloned);
+                cloned.css('opacity','1');
+            }
+        }
+
+            // Populate education input data fields
+            for (var i = 0; i < rowData.education.length; i++) {
+                var educationItem = rowData.education[i];   
+                $('.degree').eq(i).val(educationItem.degree);
+                $('.school').eq(i).val(educationItem.school);
+                $('.startDate').eq(i).val(educationItem.startDate);
+                $('.passoutYear').eq(i).val(educationItem.passoutYear);
+                $('.percentage').eq(i).val(educationItem.percentage);
+                $('.backlog').eq(i).val(educationItem.backlog);   
+            }
+            
+
         // Show the edit modal
         $('#editModal').modal('show');
     });
 
     var rowDelete;
-    // Handle edit button click
+    // Handle delete button click
     $('#myTable').on('click', '.delete-button', function() {
         // Ask for confirmation before deleting
         rowDelete = table.row($(this).parents('tr')).index();
@@ -117,6 +160,7 @@ $(document).ready(function(){
     });
 
     function handleFormSubmitForEditing(event){
+        event.preventDefault();
         const educationData = [];
         const educationInputs = $('.educationForm');
 
@@ -169,32 +213,91 @@ $(document).ready(function(){
             alert("Please fill out all the required fields");
         }
 
+        $('.removeAnyTime').remove();
+
         // Close the Bootstrap modal using jQuery
-        $('#exampleModal').modal('hide');        
+        $('#exampleModal').modal('hide');   
+        
+        $('#submitForm').removeClass('editing-mode');
 
     }
 
-    var table = $('#myTable').DataTable({
+    // event listener to open education details
+    $('#myTable').on('click','.edu-button',function(){
+
+        let moreRow = table.row($(this).parents('tr')).index();
+
+        // Retrieve the data for the corresponding row from the storedData array
+        let moreData = storedData[moreRow];
+
+        console.log('Edit button clicked for row:', moreData);
+
+            // Destroy existing DataTable instances
+            $('#personalDetail').DataTable().destroy();
+            $('#educationDetail').DataTable().destroy();
+        let personalDetail = $('#personalDetail');
+        personalDetail.DataTable({
+            data: [moreData],
+
+            columns:[
+                {data: 'firstName' , className: 'dt-center'},
+                {data: 'lastName' , className: 'dt-center'},
+                {data: 'dob', className: 'dt-center'},
+                {data: 'email', className: 'dt-center'},
+                {data: 'address', className: 'dt-center'},
+                {data: 'graduateYear', className: 'dt-center'}
+            ],
+
+            "lengthChange": false, // Disable the entries per page option
+            "searching": false, // Disable searching
+            "ordering": false, // Disable ordering
+            "info": false, // Disable the information display
+            "paging": false // Disable pagination
+        });
+        $('#educationDetail').DataTable({
+            data: moreData.education,
+            columns:[
+                {data: 'degree', className: 'dt-center'},
+                {data: 'school', className: 'dt-center'},
+                {data: 'startDate', className: 'dt-center'},
+                {data: 'passoutYear', className: 'dt-center'},
+                {data: 'percentage', className: 'dt-center'},
+                {data: 'backlog', className: 'dt-center'}
+            ],
+            "lengthChange": false, // Disable the entries per page option
+            "searching": false, // Disable searching
+            "ordering": false, // Disable ordering
+            "info": false, // Disable the information display
+            "paging": false // Disable pagination
+        });
+    })
+
+    var table = $('#myTable').DataTable({     
         data: storedData,
         columns:[
-            {data: 'firstName'},
-            {data: 'lastName'},
-            {data: 'dob'},
-            {data: 'email'},
-            {data: 'address'},
-            {data: 'graduateYear'},
+            {data: 'firstName', className: 'dt-center' },
+            {data: 'lastName' , className: 'dt-center'},
+            {data: 'dob' , className: 'dt-center'},
+            {data: 'email' , className: 'dt-center'},
+            {data: 'address' , className: 'dt-center'},
+            {data: 'graduateYear' , className: 'dt-center'},
+            {
+                // For education details
+                data: null,
+                defaultContent: '<button class="edu-button btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal2">More</button>',
+                targets: -1,
+                className: 'dt-center'
+            },
             {
                 // Custom rendering for the last column with edit and delete buttons
                 data: null,
                 defaultContent: '<button class="edit-button btn btn-primary"  data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-solid fa-pen-to-square" id="icon"></i></button>                      <button class="delete-button btn btn-red"><i class="fa-solid fa-trash"></i></button>',
-                targets: -1
+                targets: -1,
+                className: 'dt-center'
             }
         ]
     });
-    $('#myTable').css({
-        backgroundColor: '#6495ED',
-        color: 'white'
-    })
+
 
     // Validations
 

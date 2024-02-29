@@ -19,3 +19,20 @@ label{
     width: 10rem;
     margin: auto;
 }
+
+#myTable
+{
+    background-color: grey;
+}
+#myTable td, #myTable th {
+    border: 1px solid black; /* Adjust border color and thickness as needed */
+
+}
+
+#personalDetail td, #personalDetail th {
+    border: 1px solid black; /* Adjust border color and thickness as needed */
+}
+
+#educationDetail td, #educationDetail th {
+    border: 1px solid black; /* Adjust border color and thickness as needed */
+}
