@@ -2,6 +2,9 @@
     display: none;
     
 } */
+*{
+    font-size: 20px;
+}
 #removeField{
     display: none;
 }
@@ -22,7 +25,7 @@ label{
 
 #myTable
 {
-    background-color: grey;
+    background-color:rgb(55 84 88);
 }
 #myTable td, #myTable th {
     border: 1px solid black; /* Adjust border color and thickness as needed */
@@ -35,4 +38,10 @@ label{
 
 #educationDetail td, #educationDetail th {
     border: 1px solid black; /* Adjust border color and thickness as needed */
+}
+
+.btn{
+    background-color: #1dcd8d !important;
+    color: black !important;
+    font-weight: bold !important;
 }
